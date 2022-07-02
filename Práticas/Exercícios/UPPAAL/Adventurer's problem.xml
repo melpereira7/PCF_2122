@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+clock z;
+chan pick, drop;
+int[0,1] l;</declaration>
+	<template>
+		<name x="5" y="5">Student</name>
+		<declaration>// Place local declarations here.
+clock x;</declaration>
+		<location id="id0" x="-612" y="-408">
+			<name x="-663" y="-417">start</name>
+		</location>
+		<location id="id1" x="-536" y="-476">
+		</location>
+		<location id="id2" x="-400" y="-476">
+		</location>
+		<location id="id3" x="-323" y="-408">
+			<name x="-306" y="-417">finish</name>
+		</location>
+		<location id="id4" x="-399" y="-331">
+		</location>
+		<location id="id5" x="-535" y="-331">
+		</location>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-629" y="-374">drop!</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-502" y="-357">x &gt;= 1</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-357" y="-331">l == 1</label>
+			<label kind="synchronisation" x="-357" y="-365">pick!</label>
+			<label kind="assignment" x="-357" y="-348">x := 0</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-349" y="-459">drop!</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-510" y="-510">x &gt;= 1</label>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-637" y="-484">l == 0</label>
+			<label kind="synchronisation" x="-637" y="-501">pick!</label>
+			<label kind="assignment" x="-637" y="-467">x := 0</label>
+		</transition>
+	</template>
+	<template>
+		<name>Adventurer</name>
+		<parameter>const int perf</parameter>
+		<declaration>clock x;</declaration>
+		<location id="id6" x="-323" y="-127">
+		</location>
+		<location id="id7" x="-110" y="-127">
+		</location>
+		<location id="id8" x="-323" y="8">
+		</location>
+		<location id="id9" x="-110" y="8">
+		</location>
+		<init ref="id6"/>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-399" y="-76">x &gt;= perf</label>
+			<label kind="synchronisation" x="-374" y="-59">drop!</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id8"/>
+			<label kind="guard" x="-289" y="-8">l == 1</label>
+			<label kind="synchronisation" x="-187" y="-8">pick!</label>
+			<label kind="assignment" x="-229" y="8">x := 0</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id9"/>
+			<label kind="guard" x="-102" y="-85">x &gt;= perf</label>
+			<label kind="synchronisation" x="-102" y="-68">drop!</label>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-297" y="-144">l == 0</label>
+			<label kind="synchronisation" x="-187" y="-144">pick!</label>
+			<label kind="assignment" x="-246" y="-127">x := 0</label>
+		</transition>
+	</template>
+	<template>
+		<name>Professor</name>
+		<declaration>clock x;</declaration>
+		<location id="id10" x="-544" y="-331">
+		</location>
+		<location id="id11" x="-612" y="-408">
+			<name x="-663" y="-417">start</name>
+		</location>
+		<location id="id12" x="-400" y="-331">
+		</location>
+		<location id="id13" x="-323" y="-408">
+			<name x="-306" y="-417">finish</name>
+		</location>
+		<location id="id14" x="-400" y="-476">
+		</location>
+		<location id="id15" x="-536" y="-476">
+		</location>
+		<init ref="id11"/>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-629" y="-374">drop!</label>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id10"/>
+			<label kind="guard" x="-502" y="-357">x &gt;= 10</label>
+		</transition>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id12"/>
+			<label kind="guard" x="-357" y="-331">l == 1</label>
+			<label kind="synchronisation" x="-357" y="-365">pick!</label>
+			<label kind="assignment" x="-357" y="-348">x := 0</label>
+		</transition>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="-349" y="-459">drop!</label>
+		</transition>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id14"/>
+			<label kind="guard" x="-510" y="-510">x &gt;= 10</label>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id15"/>
+			<label kind="guard" x="-637" y="-484">l == 0</label>
+			<label kind="synchronisation" x="-637" y="-501">pick!</label>
+			<label kind="assignment" x="-637" y="-467">x := 0</label>
+		</transition>
+	</template>
+	<template>
+		<name>Assistant</name>
+		<declaration>clock x;</declaration>
+		<location id="id16" x="-544" y="-331">
+		</location>
+		<location id="id17" x="-620" y="-408">
+			<name x="-671" y="-417">start</name>
+		</location>
+		<location id="id18" x="-400" y="-331">
+		</location>
+		<location id="id19" x="-323" y="-408">
+			<name x="-306" y="-417">finish</name>
+		</location>
+		<location id="id20" x="-400" y="-476">
+		</location>
+		<location id="id21" x="-536" y="-476">
+		</location>
+		<init ref="id17"/>
+		<transition>
+			<source ref="id16"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-629" y="-365">drop!</label>
+		</transition>
+		<transition>
+			<source ref="id18"/>
+			<target ref="id16"/>
+			<label kind="guard" x="-501" y="-357">x &gt;= 2</label>
+		</transition>
+		<transition>
+			<source ref="id19"/>
+			<target ref="id18"/>
+			<label kind="guard" x="-357" y="-331">l == 1</label>
+			<label kind="synchronisation" x="-357" y="-365">pick!</label>
+			<label kind="assignment" x="-357" y="-348">x := 0</label>
+		</transition>
+		<transition>
+			<source ref="id20"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-349" y="-459">drop!</label>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id20"/>
+			<label kind="guard" x="-510" y="-510">x &gt;= 2</label>
+		</transition>
+		<transition>
+			<source ref="id17"/>
+			<target ref="id21"/>
+			<label kind="guard" x="-637" y="-484">l == 0</label>
+			<label kind="synchronisation" x="-637" y="-501">pick!</label>
+			<label kind="assignment" x="-637" y="-467">x := 0</label>
+		</transition>
+	</template>
+	<template>
+		<name>Janitor</name>
+		<declaration>clock x;</declaration>
+		<location id="id22" x="-544" y="-331">
+		</location>
+		<location id="id23" x="-612" y="-408">
+			<name x="-663" y="-417">start</name>
+		</location>
+		<location id="id24" x="-400" y="-331">
+		</location>
+		<location id="id25" x="-323" y="-408">
+			<name x="-306" y="-417">finish</name>
+		</location>
+		<location id="id26" x="-400" y="-476">
+		</location>
+		<location id="id27" x="-536" y="-476">
+		</location>
+		<init ref="id23"/>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="-629" y="-374">drop!</label>
+		</transition>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id22"/>
+			<label kind="guard" x="-502" y="-357">x &gt;= 5</label>
+		</transition>
+		<transition>
+			<source ref="id25"/>
+			<target ref="id24"/>
+			<label kind="guard" x="-357" y="-331">l == 1</label>
+			<label kind="synchronisation" x="-357" y="-365">pick!</label>
+			<label kind="assignment" x="-357" y="-348">x := 0</label>
+		</transition>
+		<transition>
+			<source ref="id26"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-349" y="-459">drop!</label>
+		</transition>
+		<transition>
+			<source ref="id27"/>
+			<target ref="id26"/>
+			<label kind="guard" x="-509" y="-510">x &gt;= 5</label>
+		</transition>
+		<transition>
+			<source ref="id23"/>
+			<target ref="id27"/>
+			<label kind="guard" x="-637" y="-484">l == 0</label>
+			<label kind="synchronisation" x="-637" y="-501">pick!</label>
+			<label kind="assignment" x="-637" y="-467">x := 0</label>
+		</transition>
+	</template>
+	<template>
+		<name>Lantern</name>
+		<location id="id28" x="-7931" y="-7777">
+		</location>
+		<location id="id29" x="-7803" y="-7803">
+			<committed/>
+		</location>
+		<location id="id30" x="-7667" y="-7777">
+		</location>
+		<location id="id31" x="-7803" y="-7752">
+		</location>
+		<init ref="id28"/>
+		<transition>
+			<source ref="id29"/>
+			<target ref="id31"/>
+		</transition>
+		<transition>
+			<source ref="id30"/>
+			<target ref="id31"/>
+			<label kind="synchronisation" x="-7752" y="-7752">drop?</label>
+			<nail x="-7735" y="-7752"/>
+		</transition>
+		<transition>
+			<source ref="id31"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-7897" y="-7752">drop?</label>
+			<label kind="assignment" x="-7913" y="-7735">l := not l</label>
+			<nail x="-7871" y="-7752"/>
+		</transition>
+		<transition>
+			<source ref="id29"/>
+			<target ref="id30"/>
+			<label kind="synchronisation" x="-7744" y="-7828">pick?</label>
+			<nail x="-7727" y="-7803"/>
+		</transition>
+		<transition>
+			<source ref="id28"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-7888" y="-7828">pick?</label>
+			<nail x="-7871" y="-7803"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+
+// List one or more processes to be composed into a system.
+
+const int student = 1;
+const int professor = 10;
+const int assistant = 2;
+const int janitor = 5;
+
+StudentA = Adventurer(student);
+ProfessorA = Adventurer(professor);
+AssistantA = Adventurer(assistant);
+JanitorA = Adventurer(janitor);
+
+
+system Student, Professor, Assistant, Janitor, Lantern;
+// system StudentA, ProfessorA, AssistantA, JanitorA, Lantern;</system>
+	<queries>
+		<query>
+			<formula>A[] not deadlock</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; (Student.finish and Professor.finish and Janitor.finish and Assistant.finish and z&lt;=17)</formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>

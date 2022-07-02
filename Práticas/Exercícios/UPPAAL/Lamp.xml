@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+clock y;
+chan press;
+
+</declaration>
+	<template>
+		<name x="5" y="5">Lamp</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id0" x="-161" y="-76">
+			<name x="-195" y="-85">off</name>
+		</location>
+		<location id="id1" x="-25" y="-76">
+			<name x="-35" y="-110">low</name>
+		</location>
+		<location id="id2" x="85" y="-76">
+			<name x="76" y="-51">bright</name>
+		</location>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-110" y="-17">press?</label>
+			<label kind="assignment" x="-102" y="0">y:=0</label>
+			<nail x="-93" y="-8"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-59" y="-170">press?</label>
+			<nail x="85" y="-153"/>
+			<nail x="-161" y="-153"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="guard" x="17" y="-76">y&lt;5</label>
+			<label kind="synchronisation" x="8" y="-102">press?</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-110" y="-76">y&gt;=5</label>
+			<label kind="synchronisation" x="-119" y="-102">press?</label>
+		</transition>
+	</template>
+	<template>
+		<name>User</name>
+		<location id="id26" x="0" y="0">
+			<name x="-10" y="-34">idle</name>
+		</location>
+		<init ref="id26"/>
+		<transition>
+			<source ref="id26"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="-110" y="-17">press!</label>
+			<nail x="-68" y="-51"/>
+			<nail x="-68" y="51"/>
+		</transition>
+	</template>
+	
+	<system>// Place template instantiations here.
+
+// List one or more processes to be composed into a system.
+system Lamp, User;
+
+    </system>
+	<queries>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>

@@ -1,0 +1,856 @@
+\documentclass[a4paper]{article}
+\usepackage[a4paper,left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[english]{babel}
+\usepackage{palatino}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage{graphicx}
+\usepackage{Adventurers}
+\usepackage{subcaption}
+\usepackage{adjustbox}
+\usepackage{color}
+
+\definecolor{red}{RGB}{255,  0,  0}
+\definecolor{blue}{RGB}{0,0,255}
+\def\red{\color{red}}
+\def\blue{\color{blue}}
+%================= local x=====================================================%
+\def\getGif#1{\includegraphics[width=0.3\textwidth]{cp2122t_media/#1.png}}
+\let\uk=\emph
+\def\aspas#1{``#1"}
+%================= lhs2tex=====================================================%
+%% ODER: format ==         = "\mathrel{==}"
+%% ODER: format /=         = "\neq "
+%
+%
+\makeatletter
+\@ifundefined{lhs2tex.lhs2tex.sty.read}%
+  {\@namedef{lhs2tex.lhs2tex.sty.read}{}%
+   \newcommand\SkipToFmtEnd{}%
+   \newcommand\EndFmtInput{}%
+   \long\def\SkipToFmtEnd#1\EndFmtInput{}%
+  }\SkipToFmtEnd
+
+\newcommand\ReadOnlyOnce[1]{\@ifundefined{#1}{\@namedef{#1}{}}\SkipToFmtEnd}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\DeclareFontFamily{OT1}{cmtex}{}
+\DeclareFontShape{OT1}{cmtex}{m}{n}
+  {<5><6><7><8>cmtex8
+   <9>cmtex9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmtex10}{}
+\DeclareFontShape{OT1}{cmtex}{m}{it}
+  {<-> ssub * cmtt/m/it}{}
+\newcommand{\texfamily}{\fontfamily{cmtex}\selectfont}
+\DeclareFontShape{OT1}{cmtt}{bx}{n}
+  {<5><6><7><8>cmtt8
+   <9>cmbtt9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmbtt10}{}
+\DeclareFontShape{OT1}{cmtex}{bx}{n}
+  {<-> ssub * cmtt/bx/n}{}
+\newcommand{\tex}[1]{\text{\texfamily#1}}	% NEU
+
+\newcommand{\Sp}{\hskip.33334em\relax}
+
+
+\newcommand{\Conid}[1]{\mathit{#1}}
+\newcommand{\Varid}[1]{\mathit{#1}}
+\newcommand{\anonymous}{\kern0.06em \vbox{\hrule\@width.5em}}
+\newcommand{\plus}{\mathbin{+\!\!\!+}}
+\newcommand{\bind}{\mathbin{>\!\!\!>\mkern-6.7mu=}}
+\newcommand{\rbind}{\mathbin{=\mkern-6.7mu<\!\!\!<}}% suggested by Neil Mitchell
+\newcommand{\sequ}{\mathbin{>\!\!\!>}}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\usepackage{polytable}
+
+%mathindent has to be defined
+\@ifundefined{mathindent}%
+  {\newdimen\mathindent\mathindent\leftmargini}%
+  {}%
+
+\def\resethooks{%
+  \global\let\SaveRestoreHook\empty
+  \global\let\ColumnHook\empty}
+\newcommand*{\savecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\savecolumns[#1]}}
+\newcommand*{\restorecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\restorecolumns[#1]}}
+\newcommand*{\aligncolumn}[2]%
+  {\g@addto@macro\ColumnHook{\column{#1}{#2}}}
+
+\resethooks
+
+\newcommand{\onelinecommentchars}{\quad-{}- }
+\newcommand{\commentbeginchars}{\enskip\{-}
+\newcommand{\commentendchars}{-\}\enskip}
+
+\newcommand{\visiblecomments}{%
+  \let\onelinecomment=\onelinecommentchars
+  \let\commentbegin=\commentbeginchars
+  \let\commentend=\commentendchars}
+
+\newcommand{\invisiblecomments}{%
+  \let\onelinecomment=\empty
+  \let\commentbegin=\empty
+  \let\commentend=\empty}
+
+\visiblecomments
+
+\newlength{\blanklineskip}
+\setlength{\blanklineskip}{0.66084ex}
+
+\newcommand{\hsindent}[1]{\quad}% default is fixed indentation
+\let\hspre\empty
+\let\hspost\empty
+\newcommand{\NB}{\textbf{NB}}
+\newcommand{\Todo}[1]{$\langle$\textbf{To do:}~#1$\rangle$}
+
+\EndFmtInput
+\makeatother
+%
+%
+%
+%
+%
+%
+% This package provides two environments suitable to take the place
+% of hscode, called "plainhscode" and "arrayhscode". 
+%
+% The plain environment surrounds each code block by vertical space,
+% and it uses \abovedisplayskip and \belowdisplayskip to get spacing
+% similar to formulas. Note that if these dimensions are changed,
+% the spacing around displayed math formulas changes as well.
+% All code is indented using \leftskip.
+%
+% Changed 19.08.2004 to reflect changes in colorcode. Should work with
+% CodeGroup.sty.
+%
+\ReadOnlyOnce{polycode.fmt}%
+\makeatletter
+
+\newcommand{\hsnewpar}[1]%
+  {{\parskip=0pt\parindent=0pt\par\vskip #1\noindent}}
+
+% can be used, for instance, to redefine the code size, by setting the
+% command to \small or something alike
+\newcommand{\hscodestyle}{}
+
+% The command \sethscode can be used to switch the code formatting
+% behaviour by mapping the hscode environment in the subst directive
+% to a new LaTeX environment.
+
+\newcommand{\sethscode}[1]%
+  {\expandafter\let\expandafter\hscode\csname #1\endcsname
+   \expandafter\let\expandafter\endhscode\csname end#1\endcsname}
+
+% "compatibility" mode restores the non-polycode.fmt layout.
+
+\newenvironment{compathscode}%
+  {\par\noindent
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed\)%
+   \par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\compaths}{\sethscode{compathscode}}
+
+% "plain" mode is the proposed default.
+% It should now work with \centering.
+% This required some changes. The old version
+% is still available for reference as oldplainhscode.
+
+\newenvironment{plainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newenvironment{oldplainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+% Here, we make plainhscode the default environment.
+
+\newcommand{\plainhs}{\sethscode{plainhscode}}
+\newcommand{\oldplainhs}{\sethscode{oldplainhscode}}
+\plainhs
+
+% The arrayhscode is like plain, but makes use of polytable's
+% parray environment which disallows page breaks in code blocks.
+
+\newenvironment{arrayhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\parray}%
+  {\endparray\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newcommand{\arrayhs}{\sethscode{arrayhscode}}
+
+% The mathhscode environment also makes use of polytable's parray 
+% environment. It is supposed to be used only inside math mode 
+% (I used it to typeset the type rules in my thesis).
+
+\newenvironment{mathhscode}%
+  {\parray}{\endparray}
+
+\newcommand{\mathhs}{\sethscode{mathhscode}}
+
+% texths is similar to mathhs, but works in text mode.
+
+\newenvironment{texthscode}%
+  {\(\parray}{\endparray\)}
+
+\newcommand{\texths}{\sethscode{texthscode}}
+
+% The framed environment places code in a framed box.
+
+\def\codeframewidth{\arrayrulewidth}
+\RequirePackage{calc}
+
+\newenvironment{framedhscode}%
+  {\parskip=\abovedisplayskip\par\noindent
+   \hscodestyle
+   \arrayrulewidth=\codeframewidth
+   \tabular{@{}|p{\linewidth-2\arraycolsep-2\arrayrulewidth-2pt}|@{}}%
+   \hline\framedhslinecorrect\\{-1.5ex}%
+   \let\endoflinesave=\\
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \framedhslinecorrect\endoflinesave{.5ex}\hline
+   \endtabular
+   \parskip=\belowdisplayskip\par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\framedhslinecorrect}[2]%
+  {#1[#2]}
+
+\newcommand{\framedhs}{\sethscode{framedhscode}}
+
+% The inlinehscode environment is an experimental environment
+% that can be used to typeset displayed code inline.
+
+\newenvironment{inlinehscode}%
+  {\(\def\column##1##2{}%
+   \let\>\undefined\let\<\undefined\let\\\undefined
+   \newcommand\>[1][]{}\newcommand\<[1][]{}\newcommand\\[1][]{}%
+   \def\fromto##1##2##3{##3}%
+   \def\nextline{}}{\) }%
+
+\newcommand{\inlinehs}{\sethscode{inlinehscode}}
+
+% The joincode environment is a separate environment that
+% can be used to surround and thereby connect multiple code
+% blocks.
+
+\newenvironment{joincode}%
+  {\let\orighscode=\hscode
+   \let\origendhscode=\endhscode
+   \def\endhscode{\def\hscode{\endgroup\def\@currenvir{hscode}\\}\begingroup}
+   %\let\SaveRestoreHook=\empty
+   %\let\ColumnHook=\empty
+   %\let\resethooks=\empty
+   \orighscode\def\hscode{\endgroup\def\@currenvir{hscode}}}%
+  {\origendhscode
+   \global\let\hscode=\orighscode
+   \global\let\endhscode=\origendhscode}%
+
+\makeatother
+\EndFmtInput
+%
+\def\ana#1{\mathopen{[\!(}#1\mathclose{)\!]}}
+%%format (bin (n) (k)) = "\Big(\vcenter{\xymatrix@R=1pt{" n "\\" k "}}\Big)"
+%%format % = "\mathbin{/}"
+\newlabel{eq:fokkinga}{{3.93}{110}{The mutual-recursion law}{section.3.17}{}}
+\def\mcond#1#2#3{#1 \rightarrow #2\;,\;#3}
+\def\plus{\mathbin{\dagger}}
+
+%---------------------------------------------------------------------------
+
+\title{\bfseries Modelling and Analysis of a Cyber-Physical System\\ with Monads \\ {\Large Cyber-Physical Programming --- Practical Assignment 2}}
+
+\author{
+    Melânia Pereira \quad \quad Paulo R. Pereira\\
+    \texttt{\{pg47520, pg47554\}@alunos.uminho.pt}
+}
+
+\begin{document}
+\raggedbottom
+\setstretch{1.25}
+
+\maketitle
+
+\begin{abstract}
+This assignment aims to model and to analyze a system with a powerful weapon of functional programming --- monads! The system to model envolves 4 adventurers, one lantern and a bridge! This 4 adventurers need to cross the bridge, but, for safety reasons, only two people can cross at the same time and one of them needs to carry the lantern, also, each adventurer takes a different time than the others to cross the bridge. The first task of the assignment is to model this system using \textsc{Haskell} and to verify some claims made by the adventurers, namely, that they can be all on the other side in 17 minutes, and also to show that it is impossible for them all to be on the other side in less then 17 minutes. This system could be modeled using different approaches and modules, as it was done in classes via UPPAAL, so the second task of the assignment focuses on the comparison of both UPPAAL and \textsc{Haskell} approaches.
+\end{abstract}
+
+
+\section{The Adventurers' Problem}
+In the middle of the night, four adventurers encounter a shabby rope-bridge spanning a deep ravine.
+For safety reasons, they decide that no more than 2 people should cross the bridge at the same
+time and that a flashlight needs to be carried by one of them in every crossing. They have only
+one flashlight. The 4 adventurers are not equally skilled: crossing the bridge takes them 1, 2, 5,
+and 10 minutes, respectively. A pair of adventurers crosses the bridge in an amount of time equal
+to that of the slowest of the two adventurers.
+
+One of the adventurers claims that they cannot be all on the other side in less than 19 minutes.
+One companion disagrees and claims that it can be done in 17 minutes.
+
+Who is right? That's what we're going to find out.
+
+\section{Monadic Approach via \textsc{Haskell} for Modelling the Problem}
+The solution is to take advantage of the non-deterministic monad (monad List) to use brute force and calculate all possible moves until we reach the final state. To deal with the time adventurers need to cross, we'll use the duration monad (already implemented by prof. Renato Neves) whose implementation adds the time each adventurer takes in a given move. This duration monad will be \aspas{encapsulated} in our final monad \ensuremath{\Conid{ListLogDur}}. This one will offer, for a certain state, a list of following states with the respective duration needed to get it and will also offer the path traveled at the moment. This path will be in a \ensuremath{\Varid{string}} and, as we'll see, it is going to be very elegant. For now, let's analyze the construction of our monad!
+\subsection{The \textit{ListLogDur} monad}
+As said before, we'll use our monad to have a list of states with the respective duration needed to get it and the path traveled at the moment. However, we want our monad to be parametric. So,
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{ListLogDur}\;\Varid{a}\mathrel{=}\Conid{LSD}\;[\mskip1.5mu \Conid{Duration}\;(\Conid{String},\Varid{a})\mskip1.5mu]\;\mathbf{deriving}\;\Conid{Show}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+We now have our set-constructor, so we need to define the $\eta$ function and the $(-)^\star$ operator. To define the $\eta$ function, when need to understand what means a effect-free representation in this monad --- it means that we have no duration and an empty path traveled. So,
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\eta \mathbin{:}\Conid{X}\to \Conid{ListLogDur}\;\Conid{X}{}\<[E]%
+\\
+\>[B]{}\eta \;\Varid{x}\mathrel{=}\Conid{LSD}\;[\mskip1.5mu \Conid{Duration}\;(\mathrm{0},([\mskip1.5mu \mskip1.5mu],\Varid{x}))\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+For the $(-)^\star$ operator, assuming a function \ensuremath{\Varid{f}\mathbin{:}\Conid{X}\to \Conid{ListLogDur}\;\Conid{Y}}, we'll have to define the function, \ensuremath{\Varid{f}^\star\mathbin{:}\Conid{X}\to \Conid{ListLogDur}\;\Conid{Y}}, which in \textsc{Haskell} corresponds to the \ensuremath{(\bind )} operation. This implementation follows along with the \ensuremath{\mathbf{instance}\;\Conid{Functor}} and the \ensuremath{\mathbf{instance}\;\Conid{Applicative}} (required by \textsc{Haskell} itself).
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{instance}\;\Conid{Functor}\;\Conid{ListLogDur}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\mathsf{fmap}\;\Varid{f}\mathrel{=}\Conid{LSD}\comp (\map \;(\mathsf{fmap}\;(\Varid{id}\times\Varid{f})))\comp \Varid{remLSD}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{instance}\;\Conid{Applicative}\;\Conid{ListLogDur}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{pure}\mathrel{=}\Conid{LSD}\comp \Varid{pure}\comp \Varid{pure}\comp (\lambda \Varid{x}\to ([\mskip1.5mu \mskip1.5mu],\Varid{x})){}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}l_1 \mathbin{<*>}l_2 \mathrel{=}\Conid{LSD}\mathbin{\$}\mathbf{do}{}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{x}\leftarrow \Varid{remLSD}\;l_1 {}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{y}\leftarrow \Varid{remLSD}\;l_2 {}\<[E]%
+\\
+\>[5]{}\hsindent{4}{}\<[9]%
+\>[9]{}\Varid{g}\;(\Varid{x},\Varid{y})\;\mathbf{where}{}\<[E]%
+\\
+\>[9]{}\hsindent{4}{}\<[13]%
+\>[13]{}\Varid{g}\;(\Conid{Duration}\;(d_1 ,(\Varid{s},\Varid{f})),\Conid{Duration}\;(d_2 ,(\Varid{s'},\Varid{x})))\mathrel{=}\Varid{return}\;(\Conid{Duration}\;(d_1 \mathbin{+}d_2 ,(\Varid{s}\mathbin{+\!\!\!+}\Varid{s'},\Varid{f}\;\Varid{x}))){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{instance}\;\Conid{Monad}\;\Conid{ListLogDur}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{return}\mathrel{=}\Varid{pure}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{l}\bind \Varid{k}\mathrel{=}\Conid{LSD}\mathbin{\$}\mathbf{do}{}\<[E]%
+\\
+\>[5]{}\hsindent{2}{}\<[7]%
+\>[7]{}\Varid{x}\leftarrow \Varid{remLSD}\;\Varid{l}{}\<[E]%
+\\
+\>[5]{}\hsindent{2}{}\<[7]%
+\>[7]{}\Varid{g}\;\Varid{x}\;\Varid{k}\;\mathbf{where}{}\<[E]%
+\\
+\>[7]{}\hsindent{2}{}\<[9]%
+\>[9]{}\Varid{g}\;(\Conid{Duration}\;(\Varid{d},(\Varid{s},\Varid{a})))\;\Varid{k}\mathrel{=}{}\<[E]%
+\\
+\>[9]{}\hsindent{2}{}\<[11]%
+\>[11]{}\map \;(\lambda (\Conid{Duration}\;(\Varid{d'},(\Varid{s'},\Varid{a})))\to (\Conid{Duration}\;(\Varid{d}\mathbin{+}\Varid{d'},(\Varid{s}\mathbin{+\!\!\!+}\Varid{s'},\Varid{a}))))\;(\Varid{remLSD}\;(\Varid{k}\;\Varid{a})){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{remLSD}\mathbin{::}\Conid{ListLogDur}\;\Varid{a}\to [\mskip1.5mu \Conid{Duration}\;(\Conid{String},\Varid{a})\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{remLSD}\;(\Conid{LSD}\;\Varid{x})\mathrel{=}\Varid{x}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\subsection{Modelling the problem}
+Adventurers are represented by the following data type:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{Adventurer}\mathrel{=}P_1 \mid P_2 \mid P_5 \mid P_{10} \;\mathbf{deriving}\;(\Conid{Show},\Conid{Eq}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Lantern is represented by the \ensuremath{()} element, so we can represent all the entities by using the coproduct and defining the following data type:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{type}\;\Conid{Object}\mathrel{=}\Conid{Adventurer}+(){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{lantern}\mathrel{=}i_2\;(){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+The names for the adventurers are quite suggestive as they are identified by the time they take to cross. However, it will be very useful to have a function that returns, for each adventurer, the time it takes to cross the bridge.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{getTimeAdv}\mathbin{::}\Conid{Adventurer}\to \Conid{Int}{}\<[E]%
+\\
+\>[B]{}\Varid{getTimeAdv}\;P_1 \mathrel{=}\mathrm{1}{}\<[E]%
+\\
+\>[B]{}\Varid{getTimeAdv}\;P_2 \mathrel{=}\mathrm{2}{}\<[E]%
+\\
+\>[B]{}\Varid{getTimeAdv}\;P_5 \mathrel{=}\mathrm{5}{}\<[E]%
+\\
+\>[B]{}\Varid{getTimeAdv}\;P_{10} \mathrel{=}\mathrm{10}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Now, we need to define the state of the game, i.e. the current position of each object (adventurers $+$ the lantern). The function \ensuremath{\underline{\Conid{False}}} represents the initial state
+of the game, with all adventurers and the lantern on the left side of
+the bridge. Similarly, the function \ensuremath{\underline{\Conid{True}}} represents the end
+state of the game, with all adventurers and the lantern on the right
+side of the bridge. We also need to define the instances \ensuremath{\Conid{Show}} and \ensuremath{\Conid{Eq}} to visualize and compare, respectively, the states of the game.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{21}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{type}\;\Conid{State}\mathrel{=}\Conid{Object}\to \Conid{Bool}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{instance}\;\Conid{Show}\;\Conid{State}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{show}\;\Varid{s}\mathrel{=}\Varid{show}\comp \Varid{show}\mathbin{\$}[\mskip1.5mu \Varid{s}\;(i_1\;P_1 ),{}\<[E]%
+\\
+\>[3]{}\hsindent{24}{}\<[27]%
+\>[27]{}\Varid{s}\;(i_1\;P_2 ),{}\<[E]%
+\\
+\>[3]{}\hsindent{24}{}\<[27]%
+\>[27]{}\Varid{s}\;(i_1\;P_5 ),{}\<[E]%
+\\
+\>[3]{}\hsindent{24}{}\<[27]%
+\>[27]{}\Varid{s}\;(i_1\;P_{10} ),{}\<[E]%
+\\
+\>[3]{}\hsindent{24}{}\<[27]%
+\>[27]{}\Varid{s}\;(i_2\;())\mskip1.5mu]{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{instance}\;\Conid{Eq}\;\Conid{State}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\equiv )\;\Varid{s1}\;\Varid{s2}\mathrel{=}\Varid{and}\;[\mskip1.5mu \Varid{s1}\;(i_1\;P_1 )\equiv \Varid{s2}\;(i_1\;P_1 ),{}\<[E]%
+\\
+\>[3]{}\hsindent{18}{}\<[21]%
+\>[21]{}\Varid{s1}\;(i_1\;P_2 )\equiv \Varid{s2}\;(i_1\;P_2 ),{}\<[E]%
+\\
+\>[3]{}\hsindent{18}{}\<[21]%
+\>[21]{}\Varid{s1}\;(i_1\;P_5 )\equiv \Varid{s2}\;(i_1\;P_5 ),{}\<[E]%
+\\
+\>[3]{}\hsindent{18}{}\<[21]%
+\>[21]{}\Varid{s1}\;(i_1\;P_{10} )\equiv \Varid{s2}\;(i_1\;P_{10} ),{}\<[E]%
+\\
+\>[3]{}\hsindent{18}{}\<[21]%
+\>[21]{}\Varid{s1}\;(i_2\;())\equiv \Varid{s2}\;(i_2\;())\mskip1.5mu]{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{gInit}\mathbin{::}\Conid{State}{}\<[E]%
+\\
+\>[B]{}\Varid{gInit}\mathrel{=}\underline{\Conid{False}}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{gEnd}\mathbin{::}\Conid{State}{}\<[E]%
+\\
+\>[B]{}\Varid{gEnd}\mathrel{=}\underline{\Conid{True}}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{state2List}\mathbin{::}\Conid{State}\to [\mskip1.5mu \Conid{Bool}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{state2List}\;\Varid{s}\mathrel{=}[\mskip1.5mu \Varid{s}\;(i_1\;P_1 ),{}\<[E]%
+\\
+\>[B]{}\hsindent{14}{}\<[14]%
+\>[14]{}\Varid{s}\;(i_1\;P_2 ),{}\<[E]%
+\\
+\>[B]{}\hsindent{14}{}\<[14]%
+\>[14]{}\Varid{s}\;(i_1\;P_5 ),{}\<[E]%
+\\
+\>[B]{}\hsindent{14}{}\<[14]%
+\>[14]{}\Varid{s}\;(i_1\;P_{10} ),{}\<[E]%
+\\
+\>[B]{}\hsindent{14}{}\<[14]%
+\>[14]{}\Varid{s}\;(i_2\;())\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Obviously, it is useful a function that changes the state of the game for a given object:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{changeState}\mathbin{::}\Conid{Object}\to \Conid{State}\to \Conid{State}{}\<[E]%
+\\
+\>[B]{}\Varid{changeState}\;\Varid{a}\;\Varid{s}\mathrel{=}\mathbf{let}\;\Varid{v}\mathrel{=}\Varid{s}\;\Varid{a}\;\mathbf{in}\;(\lambda \Varid{x}\to \mathbf{if}\;\Varid{x}\equiv \Varid{a}\;\mathbf{then}\;\neg \;\Varid{v}\;\mathbf{else}\;\Varid{s}\;\Varid{x}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Even more useful is a function that changes the state of the game of a list of objects: 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{mChangeState}\mathbin{::}[\mskip1.5mu \Conid{Object}\mskip1.5mu]\to \Conid{State}\to \Conid{State}{}\<[E]%
+\\
+\>[B]{}\Varid{mChangeState}\;\Varid{os}\;\Varid{s}\mathrel{=}\Varid{foldr}\;\Varid{changeState}\;\Varid{s}\;\Varid{os}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+With this, we are now ready to define all the valids plays the adventurers can make for a given state of the game, storing, obviously, the respective duration required and the move made. So, for a given \ensuremath{\Varid{s}\mathbin{::}\Conid{State}}, we'll compute \ensuremath{\Varid{allValidPlays}\mathbin{::}\Conid{ListLogDur}\;\Conid{State}} $\sim$ \ensuremath{\Conid{LSD}\;[\mskip1.5mu \Conid{Duration}\;(\Conid{String},\Conid{State})\mskip1.5mu]}. For that, let's think:
+\begin{enumerate}
+\item We need to move adventurers --- but only adventurers who can pick up the lantern. So, for that given state, we first need to calculate the adventurers who are where the lantern is.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{advsWhereLanternIs}\mathbin{::}\Conid{State}\to [\mskip1.5mu \Conid{Adventurer}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{advsWhereLanternIs}\;\Varid{s}\mathrel{=}\Varid{filter}\;((\equiv \Varid{s}\;\Varid{lantern})\comp \Varid{s}\comp i_1)\;[\mskip1.5mu P_1 ,P_2 ,P_5 ,P_{10} \mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\item Now, since we got the adventurers who can cross, we need to group them into all possible combinations. As we know, a maximum of 2 adventurers can cross. This parametric function
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{combinationsUpTo2}\mathbin{::}\Conid{Eq}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu [\mskip1.5mu \Varid{a}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{combinationsUpTo2}\mathrel{=}\mathsf{conc}\comp \conj{\Varid{f}}{\Varid{g}}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{7}{}\<[7]%
+\>[7]{}\Varid{f}\;\Varid{t}\mathrel{=}\mathbf{do}\;\{\mskip1.5mu \Varid{x}\leftarrow \Varid{t};\Varid{return}\;[\mskip1.5mu \Varid{x}\mskip1.5mu]\mskip1.5mu\}{}\<[E]%
+\\
+\>[B]{}\hsindent{7}{}\<[7]%
+\>[7]{}\Varid{g}\;\Varid{t}\mathrel{=}\mathbf{do}\;\{\mskip1.5mu \Varid{x}\leftarrow \Varid{t};\Varid{y}\leftarrow (\Varid{remove}\;\Varid{x}\;\Varid{t});\Varid{return}\;[\mskip1.5mu \Varid{x},\Varid{y}\mskip1.5mu]\mskip1.5mu\}{}\<[E]%
+\\
+\>[B]{}\hsindent{7}{}\<[7]%
+\>[7]{}\Varid{remove}\;\Varid{x}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}[\mskip1.5mu \mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\hsindent{7}{}\<[7]%
+\>[7]{}\Varid{remove}\;\Varid{x}\;(\Varid{h}\mathbin{:}\Varid{t})\mathrel{=}\mathbf{if}\;\Varid{x}\equiv \Varid{h}\;\mathbf{then}\;\Varid{t}\;\mathbf{else}\;\Varid{remove}\;\Varid{x}\;\Varid{t}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+applied to the list of all possivle adventurers will return all possible groups in sublists.
+\item Now, we have to get the time both group need to cross --- we just need to map the function \ensuremath{\Varid{getTimeAdv}} and return the maximum value. We may also produce the pair with this result and the initial list of adventurers.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{addTime}\mathbin{::}[\mskip1.5mu \Conid{Adventurer}\mskip1.5mu]\to (\Conid{Int},[\mskip1.5mu \Conid{Adventurer}\mskip1.5mu]){}\<[E]%
+\\
+\>[B]{}\Varid{addTime}\mathrel{=}\conj{\Varid{maximum}\comp (\map \;\Varid{getTimeAdv})}{\Varid{id}}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\item We also need to add the lantern to the group that is going to cross --- they need the lantern to cross. This returns the list of objects that are going to cross and the time needed to do it.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{addLantern}\mathbin{::}(\Conid{Int},[\mskip1.5mu \Conid{Adventurer}\mskip1.5mu])\to (\Conid{Int},[\mskip1.5mu \Conid{Object}\mskip1.5mu]){}\<[E]%
+\\
+\>[B]{}\Varid{addLantern}\mathrel{=}\Varid{id}\times((\Varid{lantern}\mathbin{:})\comp \map \;i_1){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\item Finally, we need to use the function \ensuremath{\map \;\Varid{mChangeState}} to change the state of that list of lists of objects (which are our possible moves) and encapsulate it in the monad using the composition \ensuremath{\Conid{LSD}\comp \map \;\Conid{Duration}}. Yes, we are missing something --- the path (or the trace)!!! For now, let's just appreciate the final function. The next subsection will explain how we get the path!
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{allValidPlays}\mathbin{::}\Conid{State}\to \Conid{ListLogDur}\;\Conid{State}{}\<[E]%
+\\
+\>[B]{}\Varid{allValidPlays}\;\Varid{s}\mathrel{=}\Conid{LSD}\mathbin{\$}\map \;\Conid{Duration}\mathbin{\$}\map \;(\Varid{id}\times\conj{\Varid{toTrace}\;\Varid{s}}{\Varid{id}}\comp (\Varid{mCS}\;\Varid{s}))\;\Varid{t}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{t}\mathrel{=}(\map \;(\Varid{addLantern}\comp \Varid{addTime})\comp \Varid{combinationsUpTo2}\comp \Varid{advsWhereLanternIs})\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{mCS}\mathrel{=}\Varid{flip}\;\Varid{mChangeState}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{toTrace}\;\Varid{s}\;\Varid{s'}\mathrel{=}\Varid{printTrace}\;(\Varid{state2List}\;\Varid{s},\Varid{state2List}\;\Varid{s'}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\end{enumerate}
+
+\subsection{The trace log}
+As we saw, our monad \ensuremath{\Conid{ListLogDur}} keeps the trace by calling the function \ensuremath{\Varid{toTrace}\mathbin{::}\Conid{State}\to \Conid{State}\to \Conid{String}}. But what does it do?
+
+First, we can see that, according to the representation of the state, adventurers can be represented by indexes. We take advantage of this to be able to present an elegant trace of the moves. For example, if the previous state is \ensuremath{[\mskip1.5mu \Conid{False},\Conid{False},\Conid{False},\Conid{False},\Conid{False}\mskip1.5mu]} and the current state is \ensuremath{[\mskip1.5mu \Conid{True},\Conid{True},\Conid{False},\Conid{False},\Conid{True}\mskip1.5mu]}, we know that \ensuremath{P_1 } and \ensuremath{P_2 } have crossed (because the first two and the last elements and diferent). So, we can simply compare element to element and, if they are different, we keep the index. In the previous example, it would return \ensuremath{[\mskip1.5mu \mathrm{0},\mathrm{1},\mathrm{4}\mskip1.5mu]} --- index 4 represents the lantern, and because we assume that the movements are always valid, we can ignore that.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{30}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{index2Adv}\mathbin{::}\Conid{Int}\to \Conid{String}{}\<[E]%
+\\
+\>[B]{}\Varid{index2Adv}\;\mathrm{0}\mathrel{=}\text{\ttfamily \char34 P1\char34}{}\<[E]%
+\\
+\>[B]{}\Varid{index2Adv}\;\mathrm{1}\mathrel{=}\text{\ttfamily \char34 P2\char34}{}\<[E]%
+\\
+\>[B]{}\Varid{index2Adv}\;\mathrm{2}\mathrel{=}\text{\ttfamily \char34 P5\char34}{}\<[E]%
+\\
+\>[B]{}\Varid{index2Adv}\;\mathrm{3}\mathrel{=}\text{\ttfamily \char34 P10\char34}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{indexesWithDifferentValues}\mathbin{::}\Conid{Eq}\;\Varid{a}\Rightarrow ([\mskip1.5mu \Varid{a}\mskip1.5mu],[\mskip1.5mu \Varid{a}\mskip1.5mu])\to [\mskip1.5mu \Conid{Int}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{indexesWithDifferentValues}\;(l_1 ,l_2 )\mathrel{=}\Varid{aux}\;l_1 \;l_2 \;\mathrm{0}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{aux}\mathbin{::}\Conid{Eq}\;\Varid{a}\Rightarrow [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \Conid{Int}\to [\mskip1.5mu \Conid{Int}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{aux}\;[\mskip1.5mu \mskip1.5mu]\;\Varid{l}\;\anonymous \mathrel{=}[\mskip1.5mu \mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{aux}\;\Varid{l}\;[\mskip1.5mu \mskip1.5mu]\;\anonymous \mathrel{=}[\mskip1.5mu \mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{aux}\;(h_1 \mathbin{:}\Varid{t1})\;(h_2 \mathbin{:}\Varid{t2})\;\Varid{index}\mathrel{=}\mathbf{if}\;h_1 \not\equiv h_2 \;\mathbf{then}\;\Varid{index}\mathbin{:}\Varid{aux}\;\Varid{t1}\;\Varid{t2}\;(\Varid{index}\mathbin{+}\mathrm{1}){}\<[E]%
+\\
+\>[3]{}\hsindent{27}{}\<[30]%
+\>[30]{}\mathbf{else}\;\Varid{aux}\;\Varid{t1}\;\Varid{t2}\;(\Varid{index}\mathbin{+}\mathrm{1}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+The result \ensuremath{[\mskip1.5mu \mathrm{0},\mathrm{1},\mathrm{4}\mskip1.5mu]} means that \aspas{\ensuremath{P_1 } and \ensuremath{P_2 } crosses}. We now have to automate this (pretty) print. We only need to ignore the lantern index (4), convert the indexes to the respective adventurers and define a print function for them.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{printTrace}\mathbin{::}([\mskip1.5mu \Conid{Bool}\mskip1.5mu],[\mskip1.5mu \Conid{Bool}\mskip1.5mu])\to \Conid{String}{}\<[E]%
+\\
+\>[B]{}\Varid{printTrace}\mathrel{=}\Varid{prettyLog}\comp (\map \;\Varid{index2Adv})\comp \Varid{init}\comp \Varid{indexesWithDifferentValues}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{prettyLog}\mathbin{::}[\mskip1.5mu \Conid{String}\mskip1.5mu]\to \Conid{String}{}\<[E]%
+\\
+\>[B]{}\Varid{prettyLog}\mathrel{=}\mcond{(\mathbin{>}\mathrm{1})\comp \length }{\Varid{f}}{(\mathbin{+\!\!\!+}\text{\ttfamily \char34 ~cross\char92 n\char34})\comp \Varid{head}}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{f}\mathrel{=}(\mathbin{+\!\!\!+}\text{\ttfamily \char34 ~crosses\char92 n\char34})\comp \mathsf{conc}\comp ((\Varid{concat}\comp \map \;(\mathbin{+\!\!\!+}\text{\ttfamily \char34 ~and~\char34}))\times\Varid{id})\comp \conj{\Varid{init}}{\Varid{last}}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Let's see the result of applying the function \ensuremath{\Varid{printTrace}} with the previous example.
+\begin{tabbing}\ttfamily
+~~\char62{}~t~\char61{}~\char40{}\char91{}False\char44{}False\char44{}False\char44{}False\char44{}False\char93{}\char44{}\char91{}True\char44{}True\char44{}False\char44{}False\char44{}True\char93{}\char41{}\\
+\ttfamily ~~\char62{}~printTrace~t\\
+\ttfamily ~~\char34{}P1~and~P2~crosses\char92{}n\char34{}
+\end{tabbing}
+Finnaly, using the function \ensuremath{\Varid{putStr}}, we get a pretty nice log:
+\begin{tabbing}\ttfamily
+~~\char62{}~putStr~\char36{}~printTrace~t\\
+\ttfamily ~~P1~and~P2~crosses
+\end{tabbing}
+Back to function \ensuremath{\Varid{allValidPlays}}, we do, for a given state \ensuremath{\Varid{s}} and each following state \ensuremath{\Varid{s'}},
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{toTrace}\;\Varid{s}\;\Varid{s'}\mathrel{=}\Varid{printTrace}\;(\Varid{state2List}\;\Varid{s},\Varid{state2List}\;\Varid{s'}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+So, this representation is done right in the calculation of the possible moves. At the end, we just need to get that already prepared trace. In the next subsection, we'll see the trace of the optimal play which shows how elegant the log is. 
+\subsection{Solving the problem}
+First, we defined a function that, for a given number \ensuremath{\Varid{n}} and an initial state, calculates
+all possible \ensuremath{\Varid{n}}-sequences of moves that the adventures can make. For that, we took advantage of the \ensuremath{\mathbf{do}} notation --- let the monad do the work for us!
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{exec}\mathbin{::}\Conid{Int}\to \Conid{State}\to \Conid{ListLogDur}\;\Conid{State}{}\<[E]%
+\\
+\>[B]{}\Varid{exec}\;\mathrm{0}\;\Varid{s}\mathrel{=}\Varid{allValidPlays}\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\Varid{exec}\;\Varid{n}\;\Varid{s}\mathrel{=}\mathbf{do}\;\Varid{ps}\leftarrow \Varid{exec}\;(\Varid{n}\mathbin{-}\mathrm{1})\;\Varid{s}{}\<[E]%
+\\
+\>[B]{}\hsindent{15}{}\<[15]%
+\>[15]{}\Varid{allValidPlays}\;\Varid{ps}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+The previous functions is nice, but not so much --- we don't know how many sequences are needed to reach the end state. It would be much better if we could execute all possible sequences of moves that the adventures can make for a given state untill it fulfills a predicate over a state (passed as a parameter). Additionally, it also returns the number of moves needed to fulfill that predicate.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{33}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{35}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{execPred}\mathbin{::}(\Conid{State}\to \Conid{Bool})\to \Conid{State}\to (\Conid{Int},\Conid{ListLogDur}\;\Conid{State}){}\<[E]%
+\\
+\>[B]{}\Varid{execPred}\;\Varid{p}\;\Varid{s}\mathrel{=}\Varid{aux}\;\Varid{p}\;\Varid{s}\;\mathrm{0}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{16}{}\<[16]%
+\>[16]{}\Varid{aux}\;\Varid{p}\;\Varid{s}\;\Varid{it}\mathrel{=}\mathbf{let}\;\Varid{st}\mathrel{=}\Varid{exec}\;\Varid{it}\;\Varid{s}{}\<[E]%
+\\
+\>[16]{}\hsindent{17}{}\<[33]%
+\>[33]{}\Varid{res}\mathrel{=}\Varid{filter}\;\Varid{pred}\;(\map \;\Varid{remDur}\;(\Varid{remLSD}\;\Varid{st}))\;\mathbf{in}{}\<[E]%
+\\
+\>[16]{}\hsindent{17}{}\<[33]%
+\>[33]{}\mathbf{if}\;\length \;(\Varid{res})\mathbin{>}\mathrm{0}\;\mathbf{then}\;((\Varid{it}\mathbin{+}\mathrm{1}),\Conid{LSD}\;(\map \;\Conid{Duration}\;\Varid{res})){}\<[E]%
+\\
+\>[16]{}\hsindent{17}{}\<[33]%
+\>[33]{}\mathbf{else}\;\Varid{aux}\;\Varid{p}\;\Varid{s}\;(\Varid{it}\mathbin{+}\mathrm{1})\;\mathbf{where}{}\<[E]%
+\\
+\>[33]{}\hsindent{2}{}\<[35]%
+\>[35]{}\Varid{remDur}\;(\Conid{Duration}\;\Varid{a})\mathrel{=}\Varid{a}{}\<[E]%
+\\
+\>[33]{}\hsindent{2}{}\<[35]%
+\>[35]{}\Varid{pred}\;(\anonymous ,(\anonymous ,\Varid{s}))\mathrel{=}\Varid{p}\;\Varid{s}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+We may use this version to solve the problem and see who's right. For that, 2 more functions were defined to see if it is possible for all adventurers to be on the other side in \ensuremath{\leq \Varid{n}} (and \ensuremath{\mathbin{<}\Varid{n}}) minutes and how many moves are needed for that.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{19}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{leqX}\mathbin{::}\Conid{Int}\to (\Conid{Int},\Conid{Bool}){}\<[E]%
+\\
+\>[B]{}\Varid{leqX}\;\Varid{n}\mathrel{=}\mathbf{if}\;\Varid{res}\;\mathbf{then}\;(\Varid{it},\Varid{res}){}\<[E]%
+\\
+\>[B]{}\hsindent{17}{}\<[17]%
+\>[17]{}\mathbf{else}\;(\mathrm{0},\Varid{res})\;\mathbf{where}{}\<[E]%
+\\
+\>[17]{}\hsindent{2}{}\<[19]%
+\>[19]{}\Varid{res}\mathrel{=}\length \;(\Varid{filter}\;\Varid{p}\;(\map \;\Varid{remDur}\;(\Varid{remLSD}\;\Varid{l})))\mathbin{>}\mathrm{0}{}\<[E]%
+\\
+\>[17]{}\hsindent{2}{}\<[19]%
+\>[19]{}(\Varid{it},\Varid{l})\mathrel{=}\Varid{execPred}\;(\equiv \Varid{gEnd})\;\Varid{gInit}{}\<[E]%
+\\
+\>[17]{}\hsindent{2}{}\<[19]%
+\>[19]{}\Varid{p}\;(\Varid{d},(\anonymous ,\anonymous ))\mathrel{=}\Varid{d}\leq \Varid{n}{}\<[E]%
+\\
+\>[17]{}\hsindent{2}{}\<[19]%
+\>[19]{}\Varid{remDur}\;(\Conid{Duration}\;\Varid{a})\mathrel{=}\Varid{a}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{lX}\mathbin{::}\Conid{Int}\to (\Conid{Int},\Conid{Bool}){}\<[E]%
+\\
+\>[B]{}\Varid{lX}\;\Varid{n}\mathrel{=}\mathbf{if}\;\Varid{res}\;\mathbf{then}\;(\Varid{it},\Varid{res}){}\<[E]%
+\\
+\>[B]{}\hsindent{15}{}\<[15]%
+\>[15]{}\mathbf{else}\;(\mathrm{0},\Varid{res})\;\mathbf{where}{}\<[E]%
+\\
+\>[15]{}\hsindent{2}{}\<[17]%
+\>[17]{}\Varid{res}\mathrel{=}\length \;(\Varid{filter}\;\Varid{p}\;(\map \;\Varid{remDur}\;(\Varid{remLSD}\;\Varid{l})))\mathbin{>}\mathrm{0}{}\<[E]%
+\\
+\>[15]{}\hsindent{2}{}\<[17]%
+\>[17]{}(\Varid{it},\Varid{l})\mathrel{=}\Varid{execPred}\;(\equiv \Varid{gEnd})\;\Varid{gInit}{}\<[E]%
+\\
+\>[15]{}\hsindent{2}{}\<[17]%
+\>[17]{}\Varid{p}\;(\Varid{d},(\anonymous ,\anonymous ))\mathrel{=}\Varid{d}\mathbin{<}\Varid{n}{}\<[E]%
+\\
+\>[15]{}\hsindent{2}{}\<[17]%
+\>[17]{}\Varid{remDur}\;(\Conid{Duration}\;\Varid{a})\mathrel{=}\Varid{a}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+So let's see who was right!
+\begin{itemize}
+\item \textit{Is it possible for all adventurers to be on the other side
+in \ensuremath{\leq \mathrm{17}} minutes and not exceeding 5 moves?}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{leq17}\mathbin{::}\Conid{Bool}{}\<[E]%
+\\
+\>[B]{}\Varid{leq17}\mathrel{=}\p2\;(\Varid{leqX}\;\mathrm{17})\mathrel{\wedge}\p1\;(\Varid{leqX}\;\mathrm{17})\leq \mathrm{5}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\begin{tabbing}\ttfamily
+~~\char62{}~leq17\\
+\ttfamily ~~True
+\end{tabbing}
+\item \textit{Is it possible for all adventurers to be on the other side
+in \ensuremath{\mathbin{<}\mathrm{17}} minutes?}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{l17}\mathbin{::}\Conid{Bool}{}\<[E]%
+\\
+\>[B]{}\Varid{l17}\mathrel{=}\p2\;(\Varid{lX}\;\mathrm{17}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\begin{tabbing}\ttfamily
+~~\char62{}~l17\\
+\ttfamily ~~False
+\end{tabbing}
+\end{itemize}
+As we saw, it is possible for all adventurers to be on the other side
+in \ensuremath{\leq \mathrm{17}} minutes and not exceeding 5 moves. Actually, since \ensuremath{\Varid{l17}} returns \ensuremath{\Conid{False}}, \ensuremath{\mathrm{17}} is the the optimal time for solving the problem (with exactly 5 moves). One could also get that information by executing the following function \textit{optimalTrace}, which shows how beautiful our trace log is!
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{optimalTrace}\mathbin{::}\fun{IO}\;(){}\<[E]%
+\\
+\>[B]{}\Varid{optimalTrace}\mathrel{=}{}\<[E]%
+\\
+\>[B]{}\hsindent{9}{}\<[9]%
+\>[9]{}\Varid{putStrLn}\comp \Varid{t}\comp \map \;\Varid{remDur}\comp \Varid{remLSD}\comp \p2\mathbin{\$}\Varid{execPred}\;(\equiv \Varid{gEnd})\;\Varid{gInit}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{9}{}\<[9]%
+\>[9]{}\Varid{t}\mathrel{=}\Varid{prt}\comp \conj{\Varid{head}\comp \map \;\p1}{\map \;(\p1\comp \p2)}\comp \Varid{pairFilter}\comp \conj{\Varid{minimum}\comp \map \;\p1}{\Varid{id}}{}\<[E]%
+\\
+\>[B]{}\hsindent{9}{}\<[9]%
+\>[9]{}\Varid{remDur}\;(\Conid{Duration}\;\Varid{a})\mathrel{=}\Varid{a}{}\<[E]%
+\\
+\>[B]{}\hsindent{9}{}\<[9]%
+\>[9]{}\Varid{pairFilter}\;(\Varid{d},\Varid{l})\mathrel{=}\Varid{filter}\;(\lambda (\Varid{d'},(\anonymous ,\anonymous ))\to \Varid{d}\equiv \Varid{d'})\;\Varid{l}{}\<[E]%
+\\
+\>[B]{}\hsindent{9}{}\<[9]%
+\>[9]{}\Varid{p}\mathrel{=}\mcond{(\mathbin{>}\mathrm{1})\comp \length }{\Varid{p'}}{\Varid{head}}{}\<[E]%
+\\
+\>[B]{}\hsindent{9}{}\<[9]%
+\>[9]{}\Varid{p'}\mathrel{=}\mathsf{conc}\comp \conj{\Varid{concat}\comp \map \;((\mathbin{+\!\!\!+}(\text{\ttfamily \char34 \char92 nOR\char92 n\char92 n\char34})))\comp \Varid{init}}{\Varid{last}}{}\<[E]%
+\\
+\>[B]{}\hsindent{9}{}\<[9]%
+\>[9]{}\Varid{prt}\;(\Varid{d},\Varid{l})\mathrel{=}(\Varid{p}\;\Varid{l})\mathbin{+\!\!\!+}\text{\ttfamily \char34 \char92 nin~\char34}\mathbin{+\!\!\!+}(\Varid{show}\;\Varid{d})\mathbin{+\!\!\!+}\text{\ttfamily \char34 ~minutes.\char34}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\begin{tabbing}\ttfamily
+~~\char62{}~optimalTrace~\\
+\ttfamily ~~P1~and~P2~crosses\\
+\ttfamily ~~P1~cross\\
+\ttfamily ~~P5~and~P10~crosses\\
+\ttfamily ~~P2~cross\\
+\ttfamily ~~P1~and~P2~crosses\\
+\ttfamily ~~\\
+\ttfamily ~~OR\\
+\ttfamily ~~\\
+\ttfamily ~~P1~and~P2~crosses\\
+\ttfamily ~~P2~cross\\
+\ttfamily ~~P5~and~P10~crosses\\
+\ttfamily ~~P1~cross\\
+\ttfamily ~~P1~and~P2~crosses\\
+\ttfamily ~~\\
+\ttfamily ~~in~17~minutes\char46{}
+\end{tabbing}
+\section{Comparative Analysis and Final Comments}
+
+Let's begin to analyze in terms of scalability. It's easy to see (for the \textsc{Haskell} approach), by running the \ensuremath{\Varid{exec}} function for a very large \ensuremath{\Varid{n}}, that the program slows down! In fact, the runtime is exponential, which one would expect given that it's a brute force implementation. However, UPPAAL model checking engine allows efficient and fast timed automata model exploration. So, for expensive executions, UPPAAL may be a better option. Also, in terms of systems security, modelling in UPPAAL can be easier because of invariants that can be easily defined. The \textsc{Haskell} approach requires the designer to correctly implement the functions to correctly model the problem, fulfilling pre and post conditions and system invariants. Syntax correctness is not enough. Therefore, it is more susceptible to errors.
+
+Even so, UPPAAL have some considerable disadvantages. One of the main disadvantages in UPPAAL is that clocks are logical concepts. The simulator does not allow seeing clock values (only the satisfaction can be checked via constraints). This works if we just want to answer the problem's questions. However, it would be nice to get the time associated to some particular execution (as \textsc{Haskell} does), e.g., the optimal trace duration. In every state of every possible sequence of moves, monad gives us the \aspas{clock value}, i.e. the duration of the moves so far. Also, concerning the space of solutions and taking into account the goal of reaching the final state with the aforementioned criteria, in the \textsc{Haskell} approach, we saw that there were two optimal solutions. However, reachability queries in UPPAAL doesn’t explore the whole state space and stops   
+when the given expression becomes true. UPPAAL does not give us all the solutions --- only one, if possible. \textsc{Haskell} gives us the entire space of solutions!
+
+On the other hand, the fact that UPPAAL produces counterexamples allows us to automatically get the trace (or path). After we verify some property (e.g. that is possible for all adventurers to be on the other side in \ensuremath{\leq \mathrm{17}} minutes and not exceeding 5 moves), one could negate the property in order to obtain the trace log for that property. In \textsc{Haskell}, there was a need to incorporate the path in the monad definition. Of course, for someone who is modelling with monads in \textsc{Haskell}, that should not be a problem at all.
+
+Considering all this, there's no way to say which approach is better. It all depends on the designer.
+A proof of this is that Melânia prefers Uppaal and Paulo prefers \textsc{Haskell}.
+
+\end{document}

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+clock y,x,z;
+chan think,eat,pick1,pick2,drop1,drop2,start,finish;
+</declaration>
+	<template>
+		<name>Philosofer1</name>
+		<location id="id0" x="-434" y="-562">
+		</location>
+		<location id="id1" x="-281" y="-638">
+		</location>
+		<location id="id2" x="-170" y="-638">
+		</location>
+		<location id="id3" x="-85" y="-578">
+		</location>
+		<location id="id4" x="-85" y="-468">
+		</location>
+		<location id="id5" x="-213" y="-468">
+		</location>
+		<location id="id6" x="-366" y="-638">
+		</location>
+		<location id="id7" x="-434" y="-468">
+		</location>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-434" y="-532">finish!</label>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="-434" y="-655">start?</label>
+			<nail x="-434" y="-638"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<nail x="-85" y="-536"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-128" y="-655">pick1!</label>
+			<nail x="-86" y="-638"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-340" y="-493">drop1!</label>
+			<nail x="-332" y="-468"/>
+			<nail x="-340" y="-468"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-170" y="-493">drop2!</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-247" y="-663">pick2!</label>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id1"/>
+			<nail x="-306" y="-638"/>
+		</transition>
+	</template>
+	<template>
+		<name>Semaphore</name>
+		<location id="id8" x="-153" y="-34">
+		</location>
+		<location id="id9" x="-17" y="-34">
+		</location>
+		<init ref="id8"/>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-136" y="0">finish?</label>
+			<nail x="-17" y="17"/>
+			<nail x="-153" y="17"/>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-127" y="-59">start!</label>
+		</transition>
+	</template>
+	<template>
+		<name>Philosofer2</name>
+		<location id="id10" x="-25" y="0">
+		</location>
+		<location id="id11" x="-246" y="-93">
+		</location>
+		<location id="id12" x="102" y="0">
+		</location>
+		<location id="id13" x="102" y="-102">
+		</location>
+		<location id="id14" x="25" y="-161">
+		</location>
+		<location id="id15" x="-93" y="-161">
+		</location>
+		<location id="id16" x="-187" y="-161">
+		</location>
+		<location id="id17" x="-246" y="0">
+		</location>
+		<init ref="id11"/>
+		<transition>
+			<source ref="id17"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="-246" y="-63">finish!</label>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id16"/>
+			<label kind="synchronisation" x="-255" y="-187">start?</label>
+			<nail x="-246" y="-161"/>
+		</transition>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id12"/>
+			<nail x="102" y="-59"/>
+		</transition>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="110" y="-161">pick2!</label>
+			<nail x="102" y="-161"/>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-153" y="-25">drop2!</label>
+			<nail x="-119" y="0"/>
+			<nail x="-153" y="0"/>
+			<nail x="-161" y="0"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="17" y="-25">drop1!</label>
+		</transition>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="-59" y="-187">pick1!</label>
+		</transition>
+		<transition>
+			<source ref="id16"/>
+			<target ref="id15"/>
+			<nail x="-119" y="-161"/>
+		</transition>
+	</template>
+	<template>
+		<name>Fork1</name>
+		<location id="id18" x="-178" y="-93">
+		</location>
+		<location id="id19" x="-59" y="-93">
+		</location>
+		<init ref="id18"/>
+		<transition>
+			<source ref="id19"/>
+			<target ref="id18"/>
+			<label kind="synchronisation" x="-160" y="-59">drop1?</label>
+			<nail x="-59" y="-42"/>
+			<nail x="-178" y="-42"/>
+		</transition>
+		<transition>
+			<source ref="id18"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-144" y="-110">pick1?</label>
+		</transition>
+	</template>
+	<template>
+		<name>Fork2</name>
+		<location id="id20" x="-59" y="-93">
+		</location>
+		<location id="id21" x="-178" y="-93">
+		</location>
+		<init ref="id21"/>
+		<transition>
+			<source ref="id20"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="-160" y="-59">drop2?</label>
+			<nail x="-59" y="-42"/>
+			<nail x="-178" y="-42"/>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="-144" y="-110">pick2?</label>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+
+// List one or more processes to be composed into a system.
+system Philosofer1,Philosofer2,Fork1,Fork2,Semaphore;
+
+    </system>
+	<queries>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>
